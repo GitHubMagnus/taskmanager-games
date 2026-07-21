@@ -51,8 +51,8 @@ const MemGame = {
     // Sprung-Puffer abarbeiten
     this.jumpBuf -= dt;
     if (this.jumpBuf > 0) {
-      if (p.onGround)      { p.vy = -430; p.onGround = false; p.jumps = 1; this.jumpBuf = 0; }
-      else if (p.jumps < 2) { p.vy = -380; p.jumps = 2; this.jumpBuf = 0; }
+      if (p.onGround)      { p.vy = -430; p.onGround = false; p.jumps = 1; this.jumpBuf = 0; S.jump(); }
+      else if (p.jumps < 2) { p.vy = -380; p.jumps = 2; this.jumpBuf = 0; S.jump(); }
     }
 
     // Physik Spieler
@@ -104,6 +104,7 @@ const MemGame = {
       if (!o.taken && Math.abs(o.x - pcx) < 16 && Math.abs((gy - o.y) - pcy) < 18) {
         o.taken = true; this.orbsTaken++; this.bonus += 25;
         this.flash('+25 Cache');
+        S.coin();
       }
     }
 

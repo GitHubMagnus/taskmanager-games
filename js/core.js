@@ -125,6 +125,7 @@ function uptimeStr() {
 
 /* Gemeinsamer Game-Over-Screen (Overlay über dem Graphen). */
 function showGameOver(reason, score, best, extra) {
+  if (typeof S !== 'undefined') S.over();
   overlay.classList.remove('hidden');
   overlay.innerHTML = `
     <h2>Game Over</h2>

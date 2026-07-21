@@ -25,7 +25,7 @@ const NetGame = {
     if (this.state === 'play' && jumpAlias.includes(code)) this.flap();
   },
   onClick() { this.flap(); },
-  flap() { this.pkt.vy = -255; },
+  flap() { this.pkt.vy = -255; S.jump(); },
   gameOver(msg) {
     this.state = 'over';
     this.best = Math.max(this.best, this.score);
@@ -67,8 +67,9 @@ const NetGame = {
       if (w.hasByte && !w.byteTaken &&
           Math.abs(p.x - (w.x + w.w / 2)) < 15 && Math.abs(p.y - (w.gapY + w.gap / 2)) < 17) {
         w.byteTaken = true; this.bytes++; this.score += 15;
+        S.bonus();
       }
-      if (!w.passed && w.x + w.w < p.x - p.r) { w.passed = true; this.passed++; this.score += 10; }
+      if (!w.passed && w.x + w.w < p.x - p.r) { w.passed = true; this.passed++; this.score += 10; S.pop(); }
     }
     this.walls = this.walls.filter(w => w.x > -50);
   },

@@ -128,8 +128,10 @@ const CPUGame = {
           if (perfect) pts += 50;
           this.stunts += flips; this.stuntPoints += pts;
           this.flash(flips + '× FLIP' + (perfect ? ' · Perfekt!' : '') + '   +' + pts);
+          S.bonus();
         } else if (this.airTime > 0.6) {
           this.stuntPoints += 20; this.flash('Big Air   +20');
+          S.pop();
         }
         car.angVel = 0;
       }
@@ -155,6 +157,7 @@ const CPUGame = {
       if (!c.taken && Math.abs(c.x - car.x) < 5 && Math.abs(c.y - (car.y + 6)) < 9) {
         c.taken = true; this.coins++; this.stuntPoints += 25;
         this.flash('+25 Datenpunkt');
+        S.coin();
       }
     }
     for (const p of this.padList) {
@@ -163,6 +166,7 @@ const CPUGame = {
         car.vx = Math.min(car.vx + 55, this.BOOSTSPEED);
         this.boostT = 1.8;
         this.flash('TURBO!');
+        S.turbo();
       }
     }
 

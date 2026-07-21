@@ -15,6 +15,17 @@ const TILES = [
 ];
 const GAMES = { cpu: CPUGame, mem: MemGame, disk: DiskGame, defrag: DefragGame, net: NetGame, gpu: GpuGame };
 
+// Start-Sound zentral: jeder erfolgreiche Spielstart klingt gleich
+for (const key in GAMES) {
+  const g = GAMES[key];
+  const orig = g.start.bind(g);
+  g.start = function () {
+    const was = g.state;
+    orig();
+    if (was !== 'play' && g.state === 'play') S.start();
+  };
+}
+
 const sidebar = document.getElementById('sidebar');
 const tileState = {};
 

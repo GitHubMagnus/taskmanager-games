@@ -163,3 +163,5 @@ kbd {
 .footer .fewer { color: #333; }
 .footer .sep { color: #bbb; margin: 0 8px; }
 .footer .resmon:hover { text-decoration: underline; cursor: default; }
+.footer .snd { margin-left: auto; cursor: pointer; user-select: none; font-size: 13px; }
+.footer .snd:hover { opacity: .7; }

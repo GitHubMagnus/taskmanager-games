@@ -51,6 +51,7 @@ const DiskGame = {
         this.burstT = 3.5;
         this.burstIn = rand(13, 18);
         this.flash('I/O-Burst!', '#0067b8');
+        S.turbo();
       }
     }
 
@@ -99,15 +100,18 @@ const DiskGame = {
           const pts = 10 * Math.min(this.combo, 5);
           this.score += pts; this.collected++;
           this.flash('+' + pts + (this.combo >= 2 ? '  ×' + Math.min(this.combo, 5) : ''), '#1a86d0');
+          S.coin();
         }
         if (it.kind === 'bonus') {
           this.combo++;
           this.score += 50; this.collected++;
           this.flash('+50 Cache!', '#f0b400');
+          S.bonus();
         }
         if (it.kind === 'bad') {
           this.lives--; this.combo = 0;
           this.flash('Bad Sector!', '#e81123');
+          S.hit();
         }
       }
       if (it.y > CH + 20) {
@@ -116,6 +120,7 @@ const DiskGame = {
           this.score = Math.max(0, this.score - 5);
           this.combo = 0;
           this.flash('-5 verpasst', '#8a8a8a');
+          S.miss();
         }
       }
     }

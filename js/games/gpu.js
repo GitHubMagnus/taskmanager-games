@@ -12,9 +12,9 @@ const GpuGame = {
     this.best = this.best || 0;
     this.ship = { x: CW / 2, w: 36, h: 14, vx: 0 };
     this.bullets = []; this.jobs = []; this.drops = [];
-    this.spawnT = 1.0; this.cool = 0;
+    this.spawnT = 1.6; this.cool = 0;
     this.fps = 60; this.kills = 0; this.score = 0; this.elapsed = 0;
-    this.jobSpeed = 42; this.bg = makeNoise();
+    this.jobSpeed = 36; this.bg = makeNoise();
     this.tripleT = 0; this.dropsCaught = 0;
     this.flashTxt = ''; this.flashCol = '#e81123'; this.flashT = 0;
     this.state = 'start';
@@ -33,7 +33,8 @@ const GpuGame = {
         this.bullets.push({ x: this.ship.x - 9, y: CH - 34 });
         this.bullets.push({ x: this.ship.x + 9, y: CH - 34 });
       }
-      this.cool = 0.3;
+      this.cool = 0.18;          // hohe Feuerrate (~5,5 Schuss/s)
+      S.shoot();
     }
   },
   gameOver() {
@@ -44,7 +45,7 @@ const GpuGame = {
   update(dt) {
     if (this.state !== 'play') return;
     this.elapsed += dt;
-    this.jobSpeed += 1.3 * dt;
+    this.jobSpeed += 1.1 * dt;
     if (this.tripleT > 0) this.tripleT -= dt;
     if (this.flashT > 0) this.flashT -= dt;
 
@@ -79,7 +80,8 @@ const GpuGame = {
                 col: ['#7a5cd6', '#4aa3df'][Math.floor(rand(0, 2))], kind: 'normal' };
       }
       this.jobs.push(job);
-      this.spawnT = rand(0.75, 1.25) * clamp(50 / (35 + this.elapsed), 0.5, 1);
+      // ruhiger Einstieg (~1,5–2,4 s Abstand), zieht über ~90 s spürbar an
+      this.spawnT = rand(1.0, 1.6) * clamp(55 / (28 + this.elapsed), 0.5, 1.5);
     }
 
     // Schüsse bewegen
@@ -94,6 +96,7 @@ const GpuGame = {
           j.hp--;
           if (j.hp <= 0) {
             j.dead = true; this.kills++; this.score += j.pts;
+            S.pop();
             // VRAM-Drop: fällt herunter, mit der Karte einsammeln
             if (Math.random() < 0.2) {
               this.drops.push({ x: j.x, y: j.y + j.h / 2, vy: 130,
@@ -106,6 +109,7 @@ const GpuGame = {
         j.dead = true;
         this.fps -= 20;
         this.flash('Frame Drop! −20 FPS');
+        S.hit();
         if (this.fps <= 0) { this.fps = 0; this.gameOver(); return; }
       }
     }
@@ -117,6 +121,7 @@ const GpuGame = {
       d.y += d.vy * dt;
       if (!d.done && d.y >= CH - 32 && d.y <= CH - 12 && Math.abs(d.x - sh.x) < sh.w / 2 + 8) {
         d.done = true; this.dropsCaught++;
+        S.bonus();
         if (d.type === 'fps') {
           this.fps = Math.min(60, this.fps + 20);
           this.flash('+20 FPS!', '#2e9c34');

@@ -6,7 +6,7 @@ Das Projekt ist reines Vanilla-JavaScript mit Canvas-2D, ohne Frameworks, ohne A
 
 ## Die sechs Spiele
 
-Überall gelten Pfeiltasten und WASD gleichwertig, ein laufendes Spiel pausiert beim Wechsel der Kachel, und nach einem Game Over startet `R` neu.
+Überall gelten Pfeiltasten und WASD gleichwertig, ein laufendes Spiel pausiert beim Wechsel der Kachel, und nach einem Game Over startet `R` neu. Alle Soundeffekte sind kleine, zur Laufzeit erzeugte WebAudio-Synth-Klänge ohne Audiodateien; `M` oder das Lautsprecher-Symbol unten rechts schaltet stumm.
 
 | Kachel | Spiel | Prinzip | Steuerung |
 |---|---|---|---|
@@ -19,4 +19,4 @@ Das Projekt ist reines Vanilla-JavaScript mit Canvas-2D, ohne Frameworks, ohne A
 
 ## Aufbau
 
-`index.html` enthält nur das Task-Manager-Markup und lädt die Skripte in fester Reihenfolge. `css/style.css` trägt den kompletten Task-Manager-Look. `js/core.js` stellt die gemeinsame Basis bereit: Utilities und Value-Noise, die redundante Tastaturbelegung, Canvas-Verwaltung samt Grid sowie den geteilten Zustand und den Game-Over-Screen. Unter `js/games/` liegt je Spiel eine Datei (`cpu.js`, `mem.js`, `disk.js`, `defrag.js`, `net.js`, `gpu.js`), die jeweils ein Objekt mit `reset`, `update`, `draw` und `infoFields` definiert. `js/main.js` verdrahtet zum Schluss Sidebar, Panel, Start-Overlays, das Fenster-Dragging und die Hauptschleife.
+`index.html` enthält nur das Task-Manager-Markup und lädt die Skripte in fester Reihenfolge. `css/style.css` trägt den kompletten Task-Manager-Look. `js/core.js` stellt die gemeinsame Basis bereit: Utilities und Value-Noise, die redundante Tastaturbelegung, Canvas-Verwaltung samt Grid sowie den geteilten Zustand und den Game-Over-Screen. `js/sound.js` liefert die WebAudio-Effekte als globales `S`-Objekt. Unter `js/games/` liegt je Spiel eine Datei (`cpu.js`, `mem.js`, `disk.js`, `defrag.js`, `net.js`, `gpu.js`), die jeweils ein Objekt mit `reset`, `update`, `draw` und `infoFields` definiert. `js/main.js` verdrahtet zum Schluss Sidebar, Panel, Start-Overlays, das Fenster-Dragging und die Hauptschleife.

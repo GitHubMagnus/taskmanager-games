@@ -83,6 +83,7 @@ const DefragGame = {
       this.frags++; this.score += 10;
       this.tickLen = Math.max(0.065, this.tickLen * 0.975);   // wird schneller
       this.placeFood();
+      S.coin();
       // nach jedem dritten Fragment: neuer defekter Sektor
       if (this.frags % 3 === 0) this.bad.push(this.randFree());
     } else if (this.gold && h.x === this.gold.x && h.y === this.gold.y) {
@@ -90,6 +91,7 @@ const DefragGame = {
       this.frags++; this.score += 30;
       this.tickLen = Math.max(0.065, this.tickLen * 0.975);
       this.gold = null; this.goldIn = rand(6, 10);
+      S.bonus();
     }
     if (!ate) this.snake.pop();
   },
