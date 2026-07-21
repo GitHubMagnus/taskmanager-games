@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task-Manager</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="window" id="tmWindow">
+    <!-- Titelleiste (zum Verschieben des Fensters greifen) -->
+    <div class="titlebar" id="titlebar">
+      <span class="ico"></span>
+      <span class="title">Task-Manager</span>
+      <span class="winbtns">
+        <span>&#8210;</span><span>&#9633;</span><span class="close">&#10005;</span>
+      </span>
+    </div>
+    <!-- Menü -->
+    <div class="menubar"><span>Datei</span><span>Optionen</span><span>Ansicht</span></div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <span class="tab">Prozesse</span>
+      <span class="tab active">Leistung</span>
+      <span class="tab">App-Verlauf</span>
+      <span class="tab">Autostart</span>
+      <span class="tab">Benutzer</span>
+      <span class="tab">Details</span>
+      <span class="tab">Dienste</span>
+    </div>
+
+    <div class="body">
+      <!-- Sidebar wird von main.js befüllt -->
+      <div class="sidebar" id="sidebar"></div>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="head">
+          <h1 id="panelTitle">CPU</h1>
+          <div class="dev" id="panelDev">11th Gen Intel(R) Core(TM) i5-11400F @ 2.60GHz</div>
+        </div>
+        <div style="font-size:11px;color:#666;margin-top:6px" id="panelSubTitle">% Auslastung</div>
+
+        <div class="graph-wrap">
+          <div class="graph-box">
+            <canvas id="gameCanvas"></canvas>
+            <div class="graph-axis-y" id="axisTop">100%</div>
+            <div class="graph-axis-y2" id="axisBot">0</div>
+            <div class="score-badge" id="scoreBadge">Score 0</div>
+            <div class="overlay" id="overlay"></div>
+          </div>
+          <div class="graph-labels">
+            <span>60 seconds</span>
+            <span></span>
+          </div>
+        </div>
+
+        <!-- Info-Panel -->
+        <div class="info" id="infoGrid"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="fewer">&#9650; Weniger Details</span>
+      <span class="sep">|</span>
+      <span class="resmon">&#128200; Ressourcenmonitor öffnen</span>
+    </div>
+  </div>
+
+<script src="js/core.js"></script>
+<script src="js/games/cpu.js"></script>
+<script src="js/games/mem.js"></script>
+<script src="js/games/disk.js"></script>
+<script src="js/games/defrag.js"></script>
+<script src="js/games/net.js"></script>
+<script src="js/games/gpu.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

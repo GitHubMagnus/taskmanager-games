@@ -1,0 +1,165 @@
+/* ---------------------------------------------------------------------------
+   Task-Manager-Look: klassischer Windows-10-"Leistung"-Tab.
+   Reinweißer Hintergrund, dünne graue Linien, Windows-Blau für Aktives.
+--------------------------------------------------------------------------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: #dfe3e6;           /* Desktop-Grau hinter dem Fenster */
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #1b1b1b;
+  -webkit-font-smoothing: antialiased;
+}
+body { display: flex; align-items: center; justify-content: center; padding: 12px; }
+
+/* Fenster-Rahmen (per Titelleiste verschiebbar, siehe main.js) */
+.window {
+  width: 900px;
+  max-width: 100%;
+  height: 620px;
+  background: #f3f3f3;
+  border: 1px solid #7a7a7a;
+  box-shadow: 0 8px 30px rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- Titelleiste --- */
+.titlebar {
+  height: 30px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  border-bottom: 1px solid #e5e5e5;
+  user-select: none;
+  touch-action: none;            /* Pointer-Dragging */
+}
+.titlebar .ico {
+  width: 16px; height: 16px; margin: 0 8px 0 2px;
+  display: inline-block; position: relative;
+}
+/* kleines "Task-Manager"-Balken-Icon aus reinem CSS */
+.titlebar .ico::before {
+  content: ""; position: absolute; inset: 1px;
+  background:
+    linear-gradient(#4aa3df,#4aa3df) 0 8px/3px 6px no-repeat,
+    linear-gradient(#4aa3df,#4aa3df) 5px 4px/3px 10px no-repeat,
+    linear-gradient(#4aa3df,#4aa3df) 10px 0/3px 14px no-repeat;
+}
+.titlebar .title { font-size: 12px; color: #333; }
+.titlebar .winbtns { margin-left: auto; display: flex; }
+.titlebar .winbtns span {
+  width: 42px; height: 30px; display: flex; align-items: center; justify-content: center;
+  color: #444; font-family: "Segoe UI Symbol","Segoe UI",sans-serif;
+}
+.titlebar .winbtns span:hover { background: #e5e5e5; }
+.titlebar .winbtns span.close:hover { background: #e81123; color: #fff; }
+
+/* --- Menüzeile --- */
+.menubar {
+  height: 24px; background: #f3f3f3; display: flex; align-items: center;
+  padding: 0 6px; border-bottom: 1px solid #e5e5e5; user-select: none;
+}
+.menubar span { padding: 3px 8px; color: #222; }
+.menubar span:hover { background: #e2e2e2; }
+
+/* --- Tab-Leiste --- */
+.tabs {
+  height: 30px; background: #f3f3f3; display: flex; align-items: flex-end;
+  padding: 0 4px; border-bottom: 1px solid #d0d0d0; user-select: none;
+}
+.tabs .tab {
+  padding: 6px 12px 5px; color: #444; border: 1px solid transparent;
+  border-bottom: none; position: relative; top: 1px;
+}
+.tabs .tab.active {
+  background: #ffffff; border-color: #d0d0d0; color: #000;
+  border-radius: 2px 2px 0 0;
+}
+.tabs .tab:not(.active):hover { background: #e8e8e8; }
+
+/* --- Arbeitsbereich: Sidebar + Content --- */
+.body { flex: 1; display: flex; background: #ffffff; min-height: 0; }
+
+/* Sidebar */
+.sidebar {
+  width: 190px; background: #ffffff; border-right: 1px solid #e2e2e2;
+  overflow-y: auto; overflow-x: hidden; flex-shrink: 0;
+}
+.sidebar::-webkit-scrollbar { width: 12px; }
+.sidebar::-webkit-scrollbar-thumb { background: #cdcdcd; }
+
+.tile {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 8px 8px 6px; cursor: pointer; position: relative;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tile:hover { background: #f5f5f5; }
+.tile.active { background: #e9e9e9; }
+.tile.active::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: #0078d7;      /* blauer Rand-Marker */
+}
+.tile canvas { width: 44px; height: 32px; background: #fff; border: 1px solid #e0e0e0; flex-shrink: 0; }
+.tile .meta { min-width: 0; line-height: 1.25; }
+.tile .meta .name { font-size: 12px; color: #202020; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .meta .sub  { font-size: 11px; color: #6a6a6a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Content-Bereich rechts */
+.content { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 12px 16px; overflow: hidden; }
+.content .head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2px; }
+.content .head h1 { font-size: 20px; font-weight: 400; color: #1b1b1b; }
+.content .head .dev { font-size: 12px; color: #444; text-align: right; }
+
+/* Graph */
+.graph-wrap { position: relative; margin-top: 8px; }
+.graph-labels { display: flex; justify-content: space-between; font-size: 11px; color: #666; }
+.graph-box {
+  position: relative; border: 1px solid #b7d5ea; background: #f7fbfe;
+}
+#gameCanvas { display: block; width: 100%; height: 260px; }
+
+/* Overlays über dem Graphen (Start / Game Over / Score) */
+.score-badge {
+  position: absolute; top: 4px; right: 6px; font-size: 11px; color: #0067b8;
+  background: rgba(255,255,255,.75); padding: 1px 5px; border-radius: 2px;
+  pointer-events: none; font-variant-numeric: tabular-nums;
+}
+.overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  background: rgba(247,251,254,.82); color: #1b1b1b; padding: 16px;
+}
+.overlay.hidden { display: none; }
+.overlay h2 { font-size: 22px; font-weight: 600; margin-bottom: 6px; color: #0067b8; }
+.overlay p { font-size: 13px; color: #333; margin: 2px 0; max-width: 460px; line-height: 1.4; }
+.overlay .big { font-size: 15px; margin-top: 8px; }
+.overlay .hint { margin-top: 12px; color: #666; font-size: 12px; }
+.overlay .keys { margin-top: 8px; color: #555; font-size: 12px; }
+kbd {
+  display: inline-block; padding: 1px 6px; border: 1px solid #bbb; border-bottom-width: 2px;
+  border-radius: 3px; background: #fafafa; font-family: inherit; font-size: 11px; margin: 0 1px;
+}
+
+.graph-axis-y { position: absolute; top: 2px; right: 6px; font-size: 11px; color: #666; }
+.graph-axis-y2 { position: absolute; bottom: 2px; right: 6px; font-size: 11px; color: #666; }
+
+/* Info-Panel (Key/Value-Grid) */
+.info {
+  margin-top: 12px; display: grid;
+  grid-template-columns: repeat(4, 1fr); gap: 4px 18px; align-content: start;
+}
+.info .cell .k { font-size: 11px; color: #666; line-height: 1.2; }
+.info .cell .v { font-size: 15px; color: #1b1b1b; font-weight: 300; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.info .cell.small .v { font-size: 12px; font-weight: 400; }
+
+.footer {
+  height: 26px; border-top: 1px solid #e5e5e5; display: flex; align-items: center;
+  padding: 0 10px; color: #0067b8; background: #f3f3f3; user-select: none;
+}
+.footer .fewer { color: #333; }
+.footer .sep { color: #bbb; margin: 0 8px; }
+.footer .resmon:hover { text-decoration: underline; cursor: default; }
