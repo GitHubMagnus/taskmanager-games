@@ -1,5 +1,7 @@
 # Task-Manager Mini-Games
 
+**▶ [Jetzt im Browser spielen](https://githubmagnus.github.io/taskmanager-games/)**
+
 Sechs kleine Arcade-Spiele, versteckt im Look des klassischen Windows-Task-Managers. Die Oberfläche bildet den „Leistung“-Tab optisch nach: Titelleiste, Menü- und Tab-Zeile, eine Sidebar mit live laufenden Sparkline-Kacheln und rechts der große Graph mit Info-Panel. Jede Kachel startet ihr eigenes Mini-Spiel direkt im Graph-Bereich, wobei Grid, Achsenbeschriftung und das Key-Value-Panel erhalten bleiben und mit echten Spielwerten gefüllt werden. Das Fenster lässt sich wie ein echtes Fenster an der Titelleiste verschieben.
 
 Das Projekt ist reines Vanilla-JavaScript mit Canvas-2D, ohne Frameworks, ohne Abhängigkeiten und ohne Build-Schritt. Zum Spielen genügt es, `index.html` im Browser zu öffnen; alternativ tut es jeder statische Server (etwa `npx serve .`). Highscores werden pro Sitzung im Speicher gehalten.
