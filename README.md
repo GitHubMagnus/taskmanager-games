@@ -10,12 +10,12 @@ Das Projekt ist reines Vanilla-JavaScript mit Canvas-2D, ohne Frameworks, ohne A
 
 | Kachel | Spiel | Prinzip | Steuerung |
 |---|---|---|---|
-| CPU | Hillclimb | Auf der Auslastungskurve fahren, Datenpunkte sammeln, Flips drehen. Hügel kosten Schwung, Crashen ist unmöglich — nur die Punkte zählen. | W/↑ Gas, S/↓ Bremse, A/D bzw. ←/→ in der Luft drehen, R neue Strecke |
-| Arbeitsspeicher | Dino-Run | Über hereinscrollende Speicherspitzen springen, mit Doppelsprung, Sprung-Puffer und variabler Sprunghöhe. Das Tempo steigt stetig. | Leertaste/W/↑ springen |
-| Datenträger 0 | Daten-Catcher | Blaue Dateien und goldenen Cache fangen, roten Bad Sectors ausweichen. Drei gefangene Bad Sectors beenden das Spiel. | A/← und D/→ |
-| Datenträger 1 | Defrag | Snake auf dem Platten-Raster: Fragmente einsammeln, die wachsende Kette nicht berühren. | WASD/Pfeiltasten lenken |
-| Ethernet | Paket-Flug | Flappy-Prinzip: das Datenpaket mit Impulsen durch die Lücken der Firewall-Wände steuern. | Leertaste/W/↑ oder Klick |
-| GPU | Render-Defense | Fallende Render-Jobs abschießen, bevor sie die Frame-Linie erreichen. Jeder Durchbruch kostet 20 FPS. | A/D bewegen, Leertaste/W/↑ feuern |
+| CPU | Hillclimb | Auf der Auslastungskurve fahren, Datenpunkte sammeln, Turbo-Pads mitnehmen und Flips drehen (Bonus für perfekte Landungen). Hügel kosten Schwung, die Kamera folgt auch vertikal, Crashen ist unmöglich. | W/↑ Gas, S/↓ Bremse, A/D bzw. ←/→ in der Luft drehen, R neue Strecke |
+| Arbeitsspeicher | Dino-Run | Über Speicherspitzen springen, Cache-Orbs in der Luft einsammeln und unter schwebenden LEAK-Blöcken durchlaufen. Doppelsprung, Sprung-Puffer und variable Sprunghöhe inklusive. | Leertaste/W/↑ springen |
+| Datenträger 0 | Daten-Catcher | Blaue Dateien und goldenen Cache fangen, roten Bad Sectors ausweichen. Fehlerfreie Serien treiben den Combo-Multiplikator bis ×5, regelmäßige I/O-Bursts bringen dichte Datei-Schauer. | A/← und D/→ |
+| Datenträger 1 | Defrag | Snake auf dem Platten-Raster: Fragmente einsammeln, goldene Fragmente verschwinden nach 5 s, und nach jedem dritten Fragment blockiert ein neuer defekter Sektor das Feld. | WASD/Pfeiltasten lenken |
+| Ethernet | Paket-Flug | Flappy-Prinzip: das Datenpaket durch Firewall-Lücken steuern, Bonus-Bytes in der Lückenmitte einsammeln — später wandern manche Lücken auf und ab. | Leertaste/W/↑ oder Klick |
+| GPU | Render-Defense | Render-Jobs abschießen, bevor sie die Frame-Linie erreichen: schwere 4K-Jobs brauchen zwei Treffer, flinke Glitch-Jobs sind schnell, VRAM-Drops geben +20 FPS oder Dreifach-Schuss. | A/D bewegen, Leertaste/W/↑ feuern |
 
 ## Aufbau
 

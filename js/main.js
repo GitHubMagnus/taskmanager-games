@@ -109,22 +109,22 @@ function currentGameKey() {
 function showStartOverlay() {
   const meta = {
     cpu:  { title:'CPU · Hillclimb',
-            desc:'Fahr über die Auslastungskurve, sammle blaue Datenpunkte ein und dreh Flips für Stunt-Punkte. Steile Hügel kosten Schwung — hol Anlauf! Crashen kannst du nicht, das Auto richtet sich immer wieder auf.',
+            desc:'Fahr über die Auslastungskurve, sammle blaue Datenpunkte und nimm die orangen Turbo-Pads mit. Flips in der Luft geben Stunt-Punkte, perfekte Landungen einen Bonus. Steile Hügel kosten Schwung — Crashen kannst du nicht.',
             keys:'<kbd>W</kbd>/<kbd>↑</kbd> Gas · <kbd>S</kbd>/<kbd>↓</kbd> Bremse · <kbd>A D</kbd>/<kbd>← →</kbd> in der Luft drehen · <kbd>R</kbd> neue Strecke' },
     mem:  { title:'Arbeitsspeicher · Dino-Run',
-            desc:'Spring über die Speicherspitzen, das Tempo steigt stetig. Doppelsprung inklusive — kurz tippen springt niedriger als halten.',
+            desc:'Spring über die Speicherspitzen und sammle blaue Cache-Orbs in der Luft. Vorsicht vor schwebenden LEAK-Blöcken — da läufst du besser drunter durch. Doppelsprung inklusive, kurz tippen springt niedriger als halten.',
             keys:'<kbd>Leertaste</kbd> / <kbd>W</kbd> / <kbd>↑</kbd> Springen (auch Klick)' },
     disk: { title:'Datenträger 0 · Daten-Catcher',
-            desc:'Sammle blaue Dateien (+10) und goldenen Cache (+50), weiche den roten Bad Sectors mit dem X aus. Drei Treffer und die Platte ist hin; verpasste Dateien kosten 5 Punkte.',
+            desc:'Sammle blaue Dateien und goldenen Cache, weiche den roten Bad Sectors aus. Fehlerfreie Serien steigern den Combo-Multiplikator bis ×5, und im I/O-Burst regnet es kurz Dateien. Drei Bad Sectors und die Platte ist hin.',
             keys:'<kbd>A</kbd>/<kbd>←</kbd> · <kbd>D</kbd>/<kbd>→</kbd> Lese-/Schreibkopf bewegen' },
     defrag:{ title:'Datenträger 1 · Defrag',
-            desc:'Steuere den Lesekopf über die Platte und sammle die orangen Fragmente ein. Die defragmentierte Kette hinter dir wächst — berühre weder den Plattenrand noch dich selbst.',
+            desc:'Sammle die orangen Fragmente ein — die Kette hinter dir wächst. Goldene Fragmente geben +30, verschwinden aber nach 5 Sekunden, und nach jedem dritten Fragment blockiert ein neuer defekter Sektor die Platte.',
             keys:'<kbd>WASD</kbd> / <kbd>Pfeiltasten</kbd> lenken' },
     net:  { title:'Ethernet · Paket-Flug',
-            desc:'Halte das Datenpaket mit kurzen Impulsen in der Luft und fliege durch die Lücken der Firewall. Jede durchflogene Wand bringt 10 Punkte, die Lücken werden enger.',
+            desc:'Halte das Datenpaket mit kurzen Impulsen in der Luft und fliege durch die Firewall-Lücken. Goldene Bonus-Bytes in der Lückenmitte geben +15 — und später fangen manche Lücken an zu wandern.',
             keys:'<kbd>Leertaste</kbd> / <kbd>W</kbd> / <kbd>↑</kbd> Impuls (auch Klick)' },
     gpu:  { title:'GPU · Render-Defense',
-            desc:'Fang die fallenden Render-Jobs mit Shader-Schüssen ab, bevor sie die Frame-Linie erreichen. Jeder Durchbruch kostet 20 FPS — bei 0 FPS ist Schluss.',
+            desc:'Schieß die Render-Jobs ab, bevor sie die Frame-Linie erreichen: schwere 4K-Jobs brauchen zwei Treffer, flinke Glitch-Jobs sind schnell. Zerstörte Jobs lassen manchmal VRAM fallen — fang es für +20 FPS oder Dreifach-Schuss.',
             keys:'<kbd>A</kbd>/<kbd>←</kbd> <kbd>D</kbd>/<kbd>→</kbd> bewegen · <kbd>Leertaste</kbd>/<kbd>W</kbd>/<kbd>↑</kbd> feuern' },
   }[currentGameKey()];
   overlay.classList.remove('hidden');

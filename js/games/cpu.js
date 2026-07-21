@@ -1,29 +1,32 @@
 "use strict";
 /* ===========================================================================
    SPIEL — CPU: "Hillclimb auf der Auslastungskurve"
-   Die CPU-Kurve ist die Fahrbahn. Bewusst gemächliches Tempo: Gas und Bremse
-   wirken weich, Hügel kosten spürbar Schwung (Anlauf holen!), der Fahrbahn-
-   winkel kommt aus beiden Radaufstandspunkten für ruhiges Fahrgefühl.
-   Crashen ist unmöglich — Punkte gibt es für Distanz, eingesammelte
-   Datenpunkte und Flips in der Luft (Bonus für perfekte Landungen).
+   Die CPU-Kurve ist die Fahrbahn. Gemächliches Grundtempo, weiches Gas,
+   Hügel kosten Schwung. Langer Radstand für ruhige, gut lesbare Steuerung;
+   die Kamera folgt vertikal, damit hohe Berge und Sprünge im Bild bleiben.
+   Crashen ist unmöglich — Punkte gibt es für Distanz, Datenpunkte, Flips
+   (Bonus für perfekte Landungen) und Turbo-Pads geben kurze Schub-Momente.
    =========================================================================== */
 const CPUGame = {
   paused: false, state: 'start',   // start | play (kein Game Over)
   score: 0, best: 0,
-  MAXSPEED: 150,                   // Welt-Einheiten/s — halb so schnell wie zuvor
-  WHEELBASE: 10,                   // Radstand in Welt-Einheiten
+  MAXSPEED: 150,                   // Grundlimit in Welt-Einheiten/s
+  BOOSTSPEED: 210,                 // Limit während Turbo
+  WHEELBASE: 14,                   // langer Radstand -> stabileres Fahrgefühl
   reset() {
     this.best = Math.max(this.best || 0, this.score || 0);
     this.state = 'start';
     this.noise = makeNoise();
     this.car = { x: 60, y: 0, vx: 30, vy: 0, angle: 0, angVel: 0, onGround: true, wheelR: 8 };
-    this.camX = 0;
+    this.camX = 0; this.camY = 0;
     this.score = 0; this.distance = 0;
     this.stunts = 0; this.stuntPoints = 0; this.coins = 0;
     this.airRot = 0; this.airTime = 0; this.speedDisplay = 0;
     this.worldScale = 3.2;         // Pixel pro Welt-Einheit horizontal
     this.flashTxt = ''; this.flashT = 0;
     this.coinList = []; this.nextCoinX = 160;
+    this.padList = []; this.nextPadX = 320;
+    this.boostT = 0;
   },
   flash(t) { this.flashTxt = t; this.flashT = 1.1; },
 
@@ -35,7 +38,7 @@ const CPUGame = {
       + (n(x * 0.028 + 10) - 0.5) * 16
       + (n(x * 0.09 + 40) - 0.5) * 5;
     const spike = n(x * 0.005 + 200);
-    if (spike > 0.72) h += (spike - 0.72) * 210;   // häufigere, kräftigere Sprungrampen
+    if (spike > 0.72) h += (spike - 0.72) * 210;   // Sprungrampen
     return h;
   },
   terrainSlope(x) { const d = 1.2; return (this.terrain(x + d) - this.terrain(x - d)) / (2 * d); },
@@ -52,14 +55,12 @@ const CPUGame = {
     while (this.nextCoinX < aheadX) {
       const x0 = this.nextCoinX;
       if (Math.random() < 0.35) {
-        // Bogen — nur per Sprung erreichbar
         for (let i = 0; i < 5; i++) {
           const cx = x0 + i * 7;
           this.coinList.push({ x: cx, y: this.terrain(cx) + 14 + Math.sin(i / 4 * Math.PI) * 10 });
         }
         this.nextCoinX = x0 + rand(130, 230);
       } else {
-        // Reihe auf der Fahrbahn
         for (let i = 0; i < 3; i++) {
           const cx = x0 + i * 8;
           this.coinList.push({ x: cx, y: this.terrain(cx) + 7 });
@@ -68,6 +69,12 @@ const CPUGame = {
       }
     }
     this.coinList = this.coinList.filter(c => !c.taken && c.x > this.camX - 20);
+    // Turbo-Pads auf der Fahrbahn
+    while (this.nextPadX < aheadX) {
+      this.padList.push({ x: this.nextPadX });
+      this.nextPadX += rand(260, 420);
+    }
+    this.padList = this.padList.filter(p => !p.taken && p.x > this.camX - 20);
   },
 
   start() { if (this.state !== 'play') { this.reset(); this.state = 'play'; overlay.classList.add('hidden'); } },
@@ -80,22 +87,21 @@ const CPUGame = {
     if (this.state !== 'play') return;
     const car = this.car;
     const g = 480;                  // niedrige Gravitation -> genug Luftzeit für Flips
-    const maxSpeed = this.MAXSPEED;
+    if (this.boostT > 0) this.boostT -= dt;
+    const effMax = this.boostT > 0 ? this.BOOSTSPEED : this.MAXSPEED;
 
     if (car.onGround) {
-      // weiches Gas/Bremse statt Arcade-Beschleunigung
       if (Keys.up)        car.vx += 140 * dt;
       else if (Keys.down) car.vx -= 210 * dt;
       else {
-        car.vx -= Math.sign(car.vx) * 50 * dt;   // Rollwiderstand beim Ausrollen
+        car.vx -= Math.sign(car.vx) * 50 * dt;   // Rollwiderstand
         if (Math.abs(car.vx) < 4) car.vx = 0;
       }
-      car.vx = clamp(car.vx, -70, maxSpeed);
+      car.vx = clamp(car.vx, -70, effMax);
     } else {
-      // Luft-Steuerung: dosierbare Rotation mit Dämpfung ohne Eingabe
       let tq = 0;
-      if (Keys.left)  tq += 1;   // Backflip (Nase hoch)
-      if (Keys.right) tq -= 1;   // Frontflip (Nase runter)
+      if (Keys.left)  tq += 1;   // Backflip
+      if (Keys.right) tq -= 1;   // Frontflip
       car.angVel += tq * 44 * dt;
       if (tq === 0) car.angVel *= (1 - 1.6 * dt);
       car.angVel = clamp(car.angVel, -14, 14);
@@ -113,9 +119,7 @@ const CPUGame = {
     if (car.y <= gh) {
       const wasAir = !car.onGround;
       if (wasAir) {
-        // KEIN Crash: Flips zählen, das Auto richtet sich immer wieder auf.
-        // Kleine Toleranz (~55°): eine fast volle Drehung liest sich auf dem
-        // Bildschirm als Flip, weil die Landung den Winkel ohnehin glattzieht.
+        // KEIN Crash: Flips zählen (mit ~55° Toleranz), Auto richtet sich auf.
         const flips = Math.floor(Math.abs(this.airRot) / (Math.PI * 2) + 0.15);
         car.angle = normAngle(car.angle);
         if (flips >= 1) {
@@ -134,8 +138,7 @@ const CPUGame = {
       car.angle = lerp(car.angle, groundAngle, clamp(dt * 14, 0, 1));
       // Hügel wirken deutlich: bergauf kostet Schwung, bergab schiebt an
       car.vx -= (slope / Math.sqrt(1 + slope * slope)) * g * 0.5 * dt;
-      car.vx = clamp(car.vx, -70, maxSpeed);
-      // vertikal der Fahrbahn folgen, aber Absprung an Kuppen erlauben
+      car.vx = clamp(car.vx, -70, effMax);
       const followVy = car.vx * slope;
       if (car.vy < followVy) car.vy = followVy;
       this.airRot = 0; this.airTime = 0;
@@ -146,17 +149,32 @@ const CPUGame = {
       this.airTime += dt;
     }
 
-    // Datenpunkte einsammeln
+    // Datenpunkte + Turbo-Pads
     this.spawnCoins();
     for (const c of this.coinList) {
-      if (!c.taken && Math.abs(c.x - car.x) < 4.5 && Math.abs(c.y - (car.y + 6)) < 9) {
+      if (!c.taken && Math.abs(c.x - car.x) < 5 && Math.abs(c.y - (car.y + 6)) < 9) {
         c.taken = true; this.coins++; this.stuntPoints += 25;
         this.flash('+25 Datenpunkt');
+      }
+    }
+    for (const p of this.padList) {
+      if (!p.taken && car.onGround && Math.abs(p.x - car.x) < 6) {
+        p.taken = true;
+        car.vx = Math.min(car.vx + 55, this.BOOSTSPEED);
+        this.boostT = 1.8;
+        this.flash('TURBO!');
       }
     }
 
     if (car.x - 60 > this.distance) this.distance = car.x - 60;
     this.camX = car.x - CW * 0.30 / this.worldScale;
+    // vertikale Kamera: hohen Bergen und Sprüngen folgen, Auto bleibt im Bild
+    const focus = Math.max(car.y, gh);
+    const camTgt = clamp(focus - 58, 0, 90);
+    this.camY = lerp(this.camY, camTgt, clamp(dt * 6, 0, 1));
+    // harte Untergrenze: das Auto darf der Kamera beim Steigen nie entkommen
+    this.camY = Math.max(this.camY, car.y - 78);
+
     this.speedDisplay = lerp(this.speedDisplay, Math.max(0, car.vx), 0.15);
     if (this.flashT > 0) this.flashT -= dt;
     this.score = Math.floor(this.distance) + this.stuntPoints;
@@ -166,7 +184,7 @@ const CPUGame = {
     ctx.clearRect(0, 0, CW, CH);
     drawGrid();
     const ws = this.worldScale;
-    const toY = wy => CH - (wy / 100) * CH;
+    const toY = wy => CH - ((wy - this.camY) / 100) * CH;
     const toX = wx => (wx - this.camX) * ws;
 
     // Fahrbahn als gefüllte blaue CPU-Kurve
@@ -187,6 +205,21 @@ const CPUGame = {
     }
     ctx.strokeStyle = '#17a0e0'; ctx.lineWidth = 2; ctx.stroke();
 
+    // Turbo-Pads (Doppel-Chevron auf der Fahrbahn)
+    for (const p of this.padList) {
+      if (p.taken) continue;
+      const px = toX(p.x), py = toY(this.terrain(p.x) + 3);
+      if (px < -20 || px > CW + 20) continue;
+      ctx.strokeStyle = '#e8590c'; ctx.lineWidth = 2.5;
+      for (const off of [0, 8]) {
+        ctx.beginPath();
+        ctx.moveTo(px - 6 + off, py - 5);
+        ctx.lineTo(px + off, py);
+        ctx.lineTo(px - 6 + off, py + 5);
+        ctx.stroke();
+      }
+    }
+
     // Datenpunkte
     for (const c of this.coinList) {
       if (c.taken) continue;
@@ -198,18 +231,25 @@ const CPUGame = {
       circle(ctx, cx, cy, 1.6); ctx.fill();
     }
 
-    // Auto
+    // Auto (langer Radstand)
     const car = this.car;
     const sx = toX(car.x), sy = toY(car.y);
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(-car.angle);        // Screen-Y ist invertiert
+    // Turbo-Flamme
+    if (this.boostT > 0) {
+      ctx.fillStyle = Math.random() < 0.5 ? '#e8590c' : '#f0b400';
+      ctx.beginPath();
+      ctx.moveTo(-27, -10); ctx.lineTo(-38 - Math.random() * 6, -13); ctx.lineTo(-27, -16);
+      ctx.closePath(); ctx.fill();
+    }
     ctx.fillStyle = '#e81123';
-    roundRect(ctx, -16, -20, 32, 14, 3); ctx.fill();
+    roundRect(ctx, -26, -20, 52, 14, 3); ctx.fill();
     ctx.fillStyle = '#c50f1f';
-    roundRect(ctx, -10, -28, 18, 9, 2); ctx.fill();   // Kabine
-    const spin = car.x * 0.8;                          // Räder drehen sich mit
-    for (const wx of [-10, 10]) {
+    roundRect(ctx, -14, -28, 26, 9, 2); ctx.fill();   // Kabine
+    const spin = car.x * 0.8;
+    for (const wx of [-20, 20]) {
       ctx.fillStyle = '#222'; circle(ctx, wx, -6, car.wheelR); ctx.fill();
       ctx.fillStyle = '#888'; circle(ctx, wx, -6, 3); ctx.fill();
       ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5;
@@ -224,7 +264,7 @@ const CPUGame = {
     if (!car.onGround && Math.abs(this.airRot) > 0.4) {
       const deg = Math.round(Math.abs(this.airRot) * 180 / Math.PI);
       ctx.fillStyle = '#0067b8'; ctx.font = '600 13px "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText(deg + '°', sx, sy - 42); ctx.textAlign = 'left';
+      ctx.textAlign = 'center'; ctx.fillText(deg + '°', sx, sy - 46); ctx.textAlign = 'left';
     }
     // Bonus-Einblendung
     if (this.flashT > 0) {
@@ -245,7 +285,7 @@ const CPUGame = {
       { k:'Stunts', v: this.stunts + ' Flips' },
       { k:'Datenpunkte', v: this.coins, small:true },
       { k:'Stunt-Punkte', v: this.stuntPoints, small:true },
-      { k:'Tempo', v: Math.round(this.speedDisplay * 1.2) + ' km/h', small:true },
+      { k:'Turbo', v: this.boostT > 0 ? 'aktiv' : '—', small:true },
       { k:'Betriebszeit', v: uptimeStr(), small:true },
     ];
   }
