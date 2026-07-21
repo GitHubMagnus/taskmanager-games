@@ -143,7 +143,7 @@ const GpuGame = {
     ctx.beginPath(); ctx.moveTo(0, CH - 18 + .5); ctx.lineTo(CW, CH - 18 + .5); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = '#e81123'; ctx.font = '10px "Segoe UI", Arial, sans-serif';
-    ctx.fillText('Frame-Linie', 6, CH - 22);
+    ctx.fillText(tr('Frame-Linie'), 6, CH - 22);
 
     // Render-Jobs (Vierecke mit Drahtgitter-Dreieck; schwere zeigen Risse)
     for (const j of this.jobs) {
@@ -214,7 +214,7 @@ const GpuGame = {
     if (this.flashT > 0) {
       ctx.globalAlpha = clamp(this.flashT / 0.9, 0, 1);
       ctx.fillStyle = this.flashCol; ctx.font = '700 14px "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText(this.flashTxt, CW / 2, 40);
+      ctx.textAlign = 'center'; ctx.fillText(tr(this.flashTxt), CW / 2, 40);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
 

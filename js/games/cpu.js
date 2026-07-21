@@ -274,7 +274,7 @@ const CPUGame = {
     if (this.flashT > 0) {
       ctx.globalAlpha = clamp(this.flashT / 1.1, 0, 1);
       ctx.fillStyle = '#e8590c'; ctx.font = '700 15px "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText(this.flashTxt, CW / 2, 34);
+      ctx.textAlign = 'center'; ctx.fillText(tr(this.flashTxt), CW / 2, 34);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
     scoreBadge.textContent = 'Score ' + this.score;

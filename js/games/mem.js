@@ -185,7 +185,7 @@ const MemGame = {
     if (this.flashT > 0) {
       ctx.globalAlpha = clamp(this.flashT / 0.9, 0, 1);
       ctx.fillStyle = '#0067b8'; ctx.font = '700 14px "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText(this.flashTxt, CW / 2, 34);
+      ctx.textAlign = 'center'; ctx.fillText(tr(this.flashTxt), CW / 2, 34);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
 

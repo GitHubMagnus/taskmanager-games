@@ -140,7 +140,7 @@ const DiskGame = {
     }
     if (this.burstT > 0) {
       ctx.fillStyle = 'rgba(0,103,184,.75)'; ctx.font = '600 12px "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText('I/O-Burst', CW / 2, 16); ctx.textAlign = 'left';
+      ctx.textAlign = 'center'; ctx.fillText(tr('I/O-Burst'), CW / 2, 16); ctx.textAlign = 'left';
     }
 
     // fallende Items
@@ -188,13 +188,13 @@ const DiskGame = {
       ctx.fillStyle = i < this.lives ? '#2e9c34' : '#d3dbde';
       roundRect(ctx, 8 + i * 16, 8, 12, 12, 2); ctx.fill();
     }
-    ctx.fillStyle = '#555'; ctx.font = '11px "Segoe UI", Arial, sans-serif'; ctx.fillText('Sektoren', 8, 34);
+    ctx.fillStyle = '#555'; ctx.font = '11px "Segoe UI", Arial, sans-serif'; ctx.fillText(tr('Sektoren'), 8, 34);
 
     // Bonus-/Treffer-Einblendung am Paddle
     if (this.flashT > 0) {
       ctx.globalAlpha = clamp(this.flashT / 0.8, 0, 1);
       ctx.fillStyle = this.flashCol; ctx.font = '700 14px "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText(this.flashTxt, pd.x, py - 14); ctx.textAlign = 'left';
+      ctx.textAlign = 'center'; ctx.fillText(tr(this.flashTxt), pd.x, py - 14); ctx.textAlign = 'left';
       ctx.globalAlpha = 1;
     }
 

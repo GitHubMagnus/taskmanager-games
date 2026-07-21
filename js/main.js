@@ -5,13 +5,14 @@
    =========================================================================== */
 
 /* ------------------------------------------------------------------ Kacheln */
+// Namen/Untertitel kommen sprachabhängig aus i18n (tile_<id>_name / _sub).
 const TILES = [
-  { id:'cpu',  name:'CPU',                    sub:'20% 3,92 GHz',        color:'#17a0e0', game:'cpu'    },
-  { id:'mem',  name:'Arbeitsspeicher',        sub:'9,7/15,9 GB (61%)',   color:'#a24bd3', game:'mem'    },
-  { id:'disk', name:'Datenträger 0 (C: D:)',  sub:'SSD  1%',             color:'#4caf50', game:'disk'   },
-  { id:'disk1',name:'Datenträger 1 (H:)',     sub:'SSD  0%',             color:'#2e9c34', game:'defrag' },
-  { id:'eth',  name:'Ethernet',               sub:'S: 0 R: 1,6 Mbps',    color:'#e67e22', game:'net'    },
-  { id:'gpu',  name:'GPU 0',                  sub:'NVIDIA GeForce  14%', color:'#d35400', game:'gpu'    },
+  { id:'cpu',   color:'#17a0e0', game:'cpu'    },
+  { id:'mem',   color:'#a24bd3', game:'mem'    },
+  { id:'disk',  color:'#4caf50', game:'disk'   },
+  { id:'disk1', color:'#2e9c34', game:'defrag' },
+  { id:'eth',   color:'#e67e22', game:'net'    },
+  { id:'gpu',   color:'#d35400', game:'gpu'    },
 ];
 const GAMES = { cpu: CPUGame, mem: MemGame, disk: DiskGame, defrag: DefragGame, net: NetGame, gpu: GpuGame };
 
@@ -29,24 +30,24 @@ for (const key in GAMES) {
 const sidebar = document.getElementById('sidebar');
 const tileState = {};
 
-TILES.forEach(t => {
+TILES.forEach(tile => {
   const el = document.createElement('div');
   el.className = 'tile';
-  el.dataset.id = t.id;
+  el.dataset.id = tile.id;
   el.innerHTML = `
     <canvas width="88" height="64"></canvas>
     <div class="meta">
-      <div class="name">${t.name}</div>
-      <div class="sub">${t.sub}</div>
+      <div class="name">${t('tile_' + tile.id + '_name')}</div>
+      <div class="sub">${t('tile_' + tile.id + '_sub')}</div>
     </div>`;
-  el.addEventListener('click', () => selectTile(t.id));
+  el.addEventListener('click', () => selectTile(tile.id));
   sidebar.appendChild(el);
 
   const c = el.querySelector('canvas');
-  tileState[t.id] = {
+  tileState[tile.id] = {
     el, canvas: c, ctx: c.getContext('2d'),
     history: new Array(48).fill(rand(10, 30)),
-    noise: makeNoise(), phase: rand(0, 100), color: t.color, value: 20
+    noise: makeNoise(), phase: rand(0, 100), color: tile.color, value: 20
   };
 });
 
@@ -74,31 +75,22 @@ function drawSparkline(st) {
 }
 
 /* ------------------------------------------------------------------ Panel */
-const PANEL_DEV = {
-  cpu:  '11th Gen Intel(R) Core(TM) i5-11400F @ 2.60GHz',
-  mem:  '15,9 GB DDR4',
-  disk: 'Samsung SSD 970 EVO',
-  disk1:'Crucial MX500 SSD',
-  eth:  'Realtek PCIe GbE Family Controller',
-  gpu:  'NVIDIA GeForce RTX 3060'
-};
-const PANEL_SUB = {
-  cpu:'% Auslastung', mem:'Speicherauslastung', disk:'Aktive Zeit  (0 - 100%)',
-  disk1:'Fragmentierung', eth:'Durchsatz', gpu:'GPU-Auslastung'
-};
+// Panel-Kopf aus i18n; Titel = Kachelname ohne Klammerzusatz.
+function setPanelHead(id) {
+  panelTitle.textContent = t('tile_' + id + '_name').replace(/\s*\(.*\)/, '');
+  panelDev.textContent = t('dev_' + id);
+  panelSubTitle.textContent = t('sub_' + id);
+}
 
 function selectTile(id) {
   currentTileId = id;
   document.querySelectorAll('.tile').forEach(el => el.classList.toggle('active', el.dataset.id === id));
-  const t = TILES.find(x => x.id === id);
+  const tile = TILES.find(x => x.id === id);
 
   if (activeGame) activeGame.paused = true;   // laufendes Spiel pausiert beim Wechsel
 
-  panelTitle.textContent = t.name.replace(/\s*\(.*\)/, '');
-  panelDev.textContent = PANEL_DEV[id] || '';
-  panelSubTitle.textContent = PANEL_SUB[id] || '';
-
-  activeGame = GAMES[t.game];
+  setPanelHead(id);
+  activeGame = GAMES[tile.game];
   activeGame.paused = false;
   activeGame.reset();
   showStartOverlay();
@@ -108,42 +100,36 @@ function selectTile(id) {
 function renderInfo() {
   if (!activeGame) return;
   infoGrid.innerHTML = activeGame.infoFields().map(f =>
-    `<div class="cell ${f.small ? 'small' : ''}"><div class="k">${f.k}</div><div class="v">${f.v}</div></div>`
+    `<div class="cell ${f.small ? 'small' : ''}"><div class="k">${tr(f.k)}</div><div class="v">${tr(f.v)}</div></div>`
   ).join('');
 }
 
 function currentGameKey() {
-  return TILES.find(t => t.id === currentTileId).game;
+  return TILES.find(x => x.id === currentTileId).game;
+}
+
+/* Sprachwechsel anwenden, ohne ein laufendes Spiel zurückzusetzen. */
+function applyLang() {
+  TILES.forEach(tile => {
+    const el = tileState[tile.id].el;
+    el.querySelector('.name').textContent = t('tile_' + tile.id + '_name');
+    el.querySelector('.sub').textContent = t('tile_' + tile.id + '_sub');
+  });
+  setPanelHead(currentTileId);
+  if (!overlay.classList.contains('hidden') && overlayRerender) overlayRerender();
+  renderInfo();
 }
 
 /* ------------------------------------------------------------------ Overlays */
 function showStartOverlay() {
-  const meta = {
-    cpu:  { title:'CPU · Hillclimb',
-            desc:'Fahr über die Auslastungskurve, sammle blaue Datenpunkte und nimm die orangen Turbo-Pads mit. Flips in der Luft geben Stunt-Punkte, perfekte Landungen einen Bonus. Steile Hügel kosten Schwung — Crashen kannst du nicht.',
-            keys:'<kbd>W</kbd>/<kbd>↑</kbd> Gas · <kbd>S</kbd>/<kbd>↓</kbd> Bremse · <kbd>A D</kbd>/<kbd>← →</kbd> in der Luft drehen · <kbd>R</kbd> neue Strecke' },
-    mem:  { title:'Arbeitsspeicher · Dino-Run',
-            desc:'Spring über die Speicherspitzen und sammle blaue Cache-Orbs in der Luft. Vorsicht vor schwebenden LEAK-Blöcken — da läufst du besser drunter durch. Doppelsprung inklusive, kurz tippen springt niedriger als halten.',
-            keys:'<kbd>Leertaste</kbd> / <kbd>W</kbd> / <kbd>↑</kbd> Springen (auch Klick)' },
-    disk: { title:'Datenträger 0 · Daten-Catcher',
-            desc:'Sammle blaue Dateien und goldenen Cache, weiche den roten Bad Sectors aus. Fehlerfreie Serien steigern den Combo-Multiplikator bis ×5, und im I/O-Burst regnet es kurz Dateien. Drei Bad Sectors und die Platte ist hin.',
-            keys:'<kbd>A</kbd>/<kbd>←</kbd> · <kbd>D</kbd>/<kbd>→</kbd> Lese-/Schreibkopf bewegen' },
-    defrag:{ title:'Datenträger 1 · Defrag',
-            desc:'Sammle die orangen Fragmente ein — die Kette hinter dir wächst. Goldene Fragmente geben +30, verschwinden aber nach 5 Sekunden, und nach jedem dritten Fragment blockiert ein neuer defekter Sektor die Platte.',
-            keys:'<kbd>WASD</kbd> / <kbd>Pfeiltasten</kbd> lenken' },
-    net:  { title:'Ethernet · Paket-Flug',
-            desc:'Halte das Datenpaket mit kurzen Impulsen in der Luft und fliege durch die Firewall-Lücken. Goldene Bonus-Bytes in der Lückenmitte geben +15 — und später fangen manche Lücken an zu wandern.',
-            keys:'<kbd>Leertaste</kbd> / <kbd>W</kbd> / <kbd>↑</kbd> Impuls (auch Klick)' },
-    gpu:  { title:'GPU · Render-Defense',
-            desc:'Schieß die Render-Jobs ab, bevor sie die Frame-Linie erreichen: schwere 4K-Jobs brauchen zwei Treffer, flinke Glitch-Jobs sind schnell. Zerstörte Jobs lassen manchmal VRAM fallen — fang es für +20 FPS oder Dreifach-Schuss.',
-            keys:'<kbd>A</kbd>/<kbd>←</kbd> <kbd>D</kbd>/<kbd>→</kbd> bewegen · <kbd>Leertaste</kbd>/<kbd>W</kbd>/<kbd>↑</kbd> feuern' },
-  }[currentGameKey()];
+  const key = currentGameKey();
   overlay.classList.remove('hidden');
   overlay.innerHTML = `
-    <h2>${meta.title}</h2>
-    <p>${meta.desc}</p>
-    <div class="keys">${meta.keys}</div>
-    <p class="hint">Klicke oder drücke eine Taste zum Starten</p>`;
+    <h2>${t('ov_' + key + '_title')}</h2>
+    <p>${t('ov_' + key + '_desc')}</p>
+    <div class="keys">${t('ov_' + key + '_keys')}</div>
+    <p class="hint">${t('start_hint')}</p>`;
+  overlayRerender = showStartOverlay;   // Sprachwechsel kann neu rendern
 }
 
 // Klick in den Graph: Start / Neustart / Spiel-Aktion (springen, flattern, schießen)

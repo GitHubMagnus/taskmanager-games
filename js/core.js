@@ -123,14 +123,22 @@ function uptimeStr() {
   return `${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
 }
 
-/* Gemeinsamer Game-Over-Screen (Overlay über dem Graphen). */
+// Hält die Render-Funktion des aktuell sichtbaren Overlays, damit die
+// Sprachumschaltung Start- und Game-Over-Screen neu aufbauen kann.
+let overlayRerender = null;
+
+/* Gemeinsamer Game-Over-Screen (Overlay über dem Graphen).
+   reason/extra kommen als deutsche Quellstrings und werden über tr()
+   lokalisiert; das Gerüst über t(). */
 function showGameOver(reason, score, best, extra) {
-  if (typeof S !== 'undefined') S.over();
+  const wasHidden = overlay.classList.contains('hidden');
   overlay.classList.remove('hidden');
   overlay.innerHTML = `
-    <h2>Game Over</h2>
-    <p>${reason}</p>
-    <p class="big">Score <b>${score}</b>${extra ? ' · ' + extra : ''}</p>
-    <p>Highscore ${best}</p>
-    <p class="hint">Drücke <kbd>R</kbd> für Neustart</p>`;
+    <h2>${t('go_title')}</h2>
+    <p>${tr(reason)}</p>
+    <p class="big">${t('go_score')} <b>${score}</b>${extra ? ' · ' + tr(extra) : ''}</p>
+    <p>${t('go_high')} ${best}</p>
+    <p class="hint">${t('go_restart')}</p>`;
+  if (typeof S !== 'undefined' && wasHidden) S.over();   // Jingle nur beim Auftauchen
+  overlayRerender = () => showGameOver(reason, score, best, extra);
 }

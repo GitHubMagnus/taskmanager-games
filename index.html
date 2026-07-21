@@ -11,22 +11,22 @@
     <!-- Titelleiste (zum Verschieben des Fensters greifen) -->
     <div class="titlebar" id="titlebar">
       <span class="ico"></span>
-      <span class="title">Task-Manager</span>
+      <span class="title" data-i18n="app_title">Task-Manager</span>
       <span class="winbtns">
         <span>&#8210;</span><span>&#9633;</span><span class="close">&#10005;</span>
       </span>
     </div>
     <!-- Menü -->
-    <div class="menubar"><span>Datei</span><span>Optionen</span><span>Ansicht</span></div>
+    <div class="menubar"><span data-i18n="m_file">Datei</span><span data-i18n="m_options">Optionen</span><span data-i18n="m_view">Ansicht</span></div>
     <!-- Tabs -->
     <div class="tabs">
-      <span class="tab">Prozesse</span>
-      <span class="tab active">Leistung</span>
-      <span class="tab">App-Verlauf</span>
-      <span class="tab">Autostart</span>
-      <span class="tab">Benutzer</span>
-      <span class="tab">Details</span>
-      <span class="tab">Dienste</span>
+      <span class="tab" data-i18n="t_proc">Prozesse</span>
+      <span class="tab active" data-i18n="t_perf">Leistung</span>
+      <span class="tab" data-i18n="t_hist">App-Verlauf</span>
+      <span class="tab" data-i18n="t_start">Autostart</span>
+      <span class="tab" data-i18n="t_users">Benutzer</span>
+      <span class="tab" data-i18n="t_details">Details</span>
+      <span class="tab" data-i18n="t_serv">Dienste</span>
     </div>
 
     <div class="body">
@@ -50,7 +50,7 @@
             <div class="overlay" id="overlay"></div>
           </div>
           <div class="graph-labels">
-            <span>60 seconds</span>
+            <span data-i18n="graph_sec">60 seconds</span>
             <span></span>
           </div>
         </div>
@@ -61,14 +61,16 @@
     </div>
 
     <div class="footer">
-      <span class="fewer">&#9650; Weniger Details</span>
+      <span class="fewer" data-i18n="f_fewer">&#9650; Weniger Details</span>
       <span class="sep">|</span>
-      <span class="resmon">&#128200; Ressourcenmonitor öffnen</span>
-      <span class="snd" id="sndToggle" title="Sound an/aus (M)">&#128266;</span>
+      <span class="resmon" data-i18n="f_resmon">&#128200; Ressourcenmonitor öffnen</span>
+      <span class="lang" id="langToggle" title="Sprache / Language">EN</span>
+      <span class="snd" id="sndToggle" data-i18n-title="snd_title" title="Sound an/aus (M)">&#128266;</span>
     </div>
   </div>
 
 <script src="js/core.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/sound.js"></script>
 <script src="js/games/cpu.js"></script>
 <script src="js/games/mem.js"></script>
